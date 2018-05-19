@@ -7,7 +7,7 @@ from readdata import generateFeatureDic
 
 http://www.cnblogs.com/beaver-sea/p/4743167.html
 数据挖掘之关联分析五（序列模式）
-https://zhuanlan.zhihu.com/p/25646166i
+https://zhuanlan.zhihu.com/p/25646166
 https://zhuanlan.zhihu.com/p/25432634
 https://zhuanlan.zhihu.com/p/25507284
 Association Rules of Data Mining（四）
@@ -292,7 +292,7 @@ def getTimeRelatedData():
 def getNormalizedBoolData():
     #读取特征
     data = generateFeatureDic(parsefile('swdata.txt'))
-   # print(data)
+    print(data)
 
     #将原特征转化为感兴趣的0、1特征
     interestDic = []
@@ -337,27 +337,31 @@ def apriori_algo(dataframe):
     column = [] 
     ms = '--'  #连接符，用来区分不同元素，如A--B。需要保证原始表格中不含有该字符
     result = pd.DataFrame(index=['support','confidence'])
-
+     
     support_series = 1.0*d.sum()/len(d)#支持度序列
     print(support_series)
     #初步根据支持度筛选
     column = list(support_series[support_series > support].index) 
+    print("1------------------------------------------------")
     print(column)
     
     k = 0
     while len(column) > 1:
         k = k + 1
-        print(u'\n正在进行地%d次搜索...',k)
+        print(u'\n正在进行地'+str(k)+'次搜索...')
         column = connect_string(column,ms)
+        print("2--------------------------------------------")
         print(column)
         sf = lambda i: d[i].prod(axis=1, numeric_only = True) #新一批支持度的计算函数
-        print(sf)
         d_2 = pd.DataFrame(list(map(sf,column)), index = [ms.join(i) for i in column]).T
+        print("3---------------------------------------------")
         print(d_2)
 
         support_series_2 = 1.0*d_2[[ms.join(i) for i in column]].sum()/len(d) #计算连接后的支持度
+        print("3计算连接后的支持度-------------------------------------")
         print(support_series_2)
         column = list(support_series_2[support_series_2 > support].index) #新一轮支持度筛选
+        print("4新一轮支持度筛选------------------------------")
         print(column)
         support_series = support_series.append(support_series_2)
         print(support_series)
@@ -368,17 +372,24 @@ def apriori_algo(dataframe):
             i = i.split(ms)
             for j in range(len(i)):
                 column2.append(i[:j]+i[j+1:]+i[j:j+1])
-        
+        print("5遍历可能的推理----------------------")
+        print(column2)
         cofidence_series = pd.Series(index=[ms.join(i) for i in column2]) #定义置信度序列
-        
+        print("6定义置信度序列-----------------------")
+        print(cofidence_series)
         for i in column2: #计算置信度序列
             cofidence_series[ms.join(i)] = support_series[ms.join(sorted(i))]/support_series[ms.join(i[:len(i)-1])]
         
+        print("7计算置信度序列----------------------")
+        print(cofidence_series)
+        print("8再对置信度进行筛选---------------------------")
+        print(cofidence_series[cofidence_series > confidence])
         for i in cofidence_series[cofidence_series > confidence].index: #置信度筛选
             result[i] = 0.0
             result[i]['confidence'] = cofidence_series[i]
             result[i]['support'] = support_series[ms.join(sorted(i.split(ms)))]
-
+        print("9----------------------------------")
+        print(result)
     result = result.T.sort_values(['confidence','support'], ascending = False) #结果整理，输出
     print(u'\n结果为：')
     print(result)
@@ -427,8 +438,11 @@ def main(argv):
                 else:
                     print(dot)
                 count = count + 1
+'''               
 if __name__ == "__main__":
 
     import sys
     exportCSV(getTimeRelatedData())
     main(sys.argv[1:])
+'''
+apriori_algo(getNormalizedBoolData())
