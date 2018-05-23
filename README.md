@@ -9,3 +9,5 @@
            implement apriori algo to find the associated cameras(just use the total duration of each camera each person,sequence data not included)  
            implement SPADE algo to find associated camera sequences  
            
+--visu.py  
+           some logical implement of visualizing the whole data traces info of every frame
