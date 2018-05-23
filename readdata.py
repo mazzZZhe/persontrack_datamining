@@ -43,7 +43,7 @@ def parsefile(name):
         l.append(eachlinelist_)
         #print('current line:'+str(eachlinelist))
     file.close()
-    #print(l)
+    print(l)
     return(l)
 
 
@@ -57,5 +57,26 @@ def parsetracevector(string):
     string[2] = int(string[2])
     string[3] = int(string[3])
     return string
+
+def getTimeRelatedInterestedData():
+    timeRelatedDataDic = []
+    data = parsefile('swdata.txt')
+    interestThreshold = 1500
+    count = 0
+    for eachperson in data:
+        count = count + 1
+        timeRelatedData = []
+        for eachrecord in eachperson:
+            if eachrecord[0] == 'p':
+                 continue  
+            duration = eachrecord[3] - eachrecord[2]
+            if duration > interestThreshold:
+                timeRelatedData.append(eachrecord[0])
+        timeRelatedDataDic.append(timeRelatedData)
+        print("intereted track of p"+ str(count) ,end = ':')
+        print(timeRelatedData)
+    #print(timeRelatedDataDic)
+    #print(len(timeRelatedDataDic))
+    return timeRelatedDataDic
 
 parsefile('swdata.txt')
