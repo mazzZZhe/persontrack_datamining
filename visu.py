@@ -1,7 +1,8 @@
 from readdata import parsefile
 import argparse
 from itertools import product  
-
+import json
+from readinfo import readinfo
 class Draw:
     def __init__(self,filename,interval_time,numofcamera,posofcameras):
         self.list = parsefile(filename)
@@ -12,6 +13,21 @@ class Draw:
         #pos
         self.posofcameras = posofcameras
         self.numofcamera = numofcamera
+        
+
+    def getMaxFrameNo(self):
+        maxframe = 0
+        for person in self.list:
+            eventCounter = 0
+            for eachEvent in person:
+               if eachEvent[0] != 'p':
+                   startframe = eachEvent[2]
+                   if startframe > maxframe:
+                       maxframe = startframe
+                   endframe = eachEvent[3]
+                   if endframe > maxframe:
+                       maxframe = endframe
+        return maxframe               
 
     def getCameraJoinList(self):
         #得到所有可能的镜头组合[((1, 2), ([1, 1], [2, 2])), ((1, 3), ([1, 1], [3, 3])), ((1, 4), ([1, 1], [4, 4])), ((1, 5), ([....list里的一个元素是两个元组，第一个是(fromCam,toCam),第二个是([fromCamX,fromCamY],[toCamX,toCamY])
@@ -43,12 +59,14 @@ class Draw:
                     if frame > startFrame and frame < endFrame:
                         isInTheArea = True
                         currentCam = cam
-                        if eventCounter == len(person) + 1:
+                        if eventCounter != len(person) - 1:
                             toCam = person[eventCounter + 1][0]
+                            print(toCam)
                         break  
             traceMap.append((isInTheArea,currentCam,toCam))
        # print(traceMap)  
         return traceMap
+    
     def getWholeTraceBook(self,maxFrame):
         tracebook = []
         for frame in range(0,maxFrame):
@@ -85,9 +103,35 @@ class Draw:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--frame',help = 'current frame',type = int,default = 30)
+    parser.add_argument('--mode',default = 'all')
+    parser.add_argument('--frame',help = 'if the mode is all,you will export the whole trace of all people .if the mode is beforeframe ,you will export the whole trace of all people before the this frame to a json;if the mode is one,you just export the position of all person under one frame ',type = int,default = 30)
+    parser.add_argument('--infoJson',help = 'the json file where store the camera number,the position of these cameras',default = "info.json")
     args = parser.parse_args()
     frame = args.frame
-    d = Draw('swdata.txt',1,6,[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6]])
-  #  d.parse_frame_list(frame)
-    d.getWholeTraceBook(4000)
+    mode = args.mode 
+    infoJson = args.infoJson    
+    info = readinfo(infoJson)
+    cameraInfo = info['camera']
+    interval_time = info['interval_time']
+    numofcamera = len(cameraInfo)
+    posofcameras =  [[camera['x'],camera['y']] for camera in cameraInfo]
+    
+    d = Draw('swdata.txt',interval_time,numofcamera,posofcameras)
+    #d.parse_frame_list(frame)
+    print("-----------------------")
+    #d.getWholeTraceBook(4000)
+    #print("-----------------------------------------")
+    #print(d.getFrameTraceMap(frame))  
+    if mode == 'beforeframe':
+        with open("beforeframe.json","w") as f:
+            json.dump(d.getWholeTraceBook(frame),f)
+            print("写入第"+str(frame)+"帧前的所有轨迹信息到json文件完毕")
+    elif mode == 'one':
+        with open('one.json','w') as f:
+            json.dump(d.getFrameTraceMap(frame),f)
+           # print("写入第"+str(frame)+"帧信息入json文件完毕"）
+    elif mode == 'all':
+        maxframe = d.getMaxFrameNo()
+        with open("all.json",'w') as f:
+            json.dump(d.getWholeTraceBook(maxframe),f)
+            print('写入所有轨迹信息到json文件中完毕')

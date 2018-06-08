@@ -5,11 +5,16 @@ from pandas.core.frame import DataFrame
 import matplotlib.pyplot as plt
 from readdata import parsefile
 from readdata import generateFeatureDic
+from readinfo import readinfo
 def cluster(featureDic):
     data = generateFeatureDic(parsefile('swdata.txt'))
    # print(data)
     data = DataFrame(data)
-    data.columns = ['c1','c2','c3','c4','c5','c6']
+    info =  readinfo('info.json')
+    cameraInfo = info['camera']
+    names = [camera['name'] for camera in cameraInfo]
+    data.columns = names
+    #data.columns = ['c1','c2','c3','c4','c5','c6']
     print(data)
     data_zs = 1.0 * (data - data.mean())/data.std()
    # print(data_zs)

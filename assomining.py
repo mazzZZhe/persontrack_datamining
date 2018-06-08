@@ -1,6 +1,7 @@
 import pandas as pd
 from readdata import parsefile
 from readdata import generateFeatureDic
+from readinfo import readinfo
 '''
 学习参考https://zh.wikipedia.org/zh-cn/%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AD%A6%E4%B9%A0  
 项集  I = {对C1感兴趣,对C2感兴趣,....对C6感兴趣}  
@@ -264,7 +265,6 @@ def exportCSV(datas):
     csvfile = open('sequenceData.csv','w')
     writer = csv.writer(csvfile)
     writer.writerow(['sid','eid','event'])
-
     writer.writerows(records)
 
     csvfile.close()
@@ -310,11 +310,14 @@ def getNormalizedBoolData():
                 interestFeature.append(0)
               #  print("not interest")
         interestDic.append(interestFeature)
-
-    #print(interestDic)            
+    print("--------------")
+    print(interestDic)            
 
     dataframe = pd.DataFrame(interestDic)
-    dataframe.columns = ['c1','c2','c3','c4','c5','c6']
+    info =  readinfo('info.json')
+    cameraInfo = info['camera']
+    names = [camera['name'] for camera in cameraInfo]
+    dataframe.columns = names
     dataframe = (dataframe == 1)
     print(dataframe)
     return dataframe
@@ -376,7 +379,6 @@ def apriori_algo(dataframe):
         
         for i in cofidence_series[cofidence_series > confidence].index: #置信度筛选
             result[i] = 0.0
-            result[i]['confidence'] = cofidence_series[i]
             result[i]['support'] = support_series[ms.join(sorted(i.split(ms)))]
 
     result = result.T.sort_values(['confidence','support'], ascending = False) #结果整理，输出
@@ -401,10 +403,10 @@ def main(argv):
 
     parser.add_argument('--file',dest='input_sequence_file',
             help='A comma-delimited text file containing input sequences.',
-            required=True)
+            default="sequenceData.csv")
     parser.add_argument('--support',dest='support_threshold',type=int,
             help='The minimum number of occurrences of a frequent sequence.',
-            required=True)
+            default=10)
 
     args = parser.parse_args(argv)
     sequences = read_sequences(args.input_sequence_file)
@@ -415,6 +417,10 @@ def main(argv):
     assoSeqs = list(frequent_sequences.keys())
     print(assoSeqs)
     print("强关联路径:")
+    
+    info =  readinfo('info.json')
+    cameraInfo = info['camera']
+    names = [camera['name'] for camera in cameraInfo]
     for seq in assoSeqs:
         seq = list(seq)
         outseq = ""
@@ -422,10 +428,10 @@ def main(argv):
             count = 0
             for dot in seq:
                 if count != len(seq) - 1:
-                    print(dot,end = "--->")
+                    print(names[int(dot)-1],end = "--->")
                     
                 else:
-                    print(dot)
+                    print(names[int(dot)-1])
                 count = count + 1
 if __name__ == "__main__":
 

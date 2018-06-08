@@ -33,7 +33,7 @@ def parsefile(name):
     [['p1', ['c1', 's1', 15, 55], ['c2', 's1', 80, 2000], ['c5', 's1', 2300, 2400], ['c4', 's1', 2600, 3800], ['c6', 's1', 3200, 3500]], ['p2', ['c1', 's1', 200, 250], ['c2', 's1', 500, 1634], ['c5', 's1', 1800, 1850], ['c4', 's1', 2000, 4200], ['c6', 's1', 4800, 4900]], ['p3', ['c1', 's1', 500, 60.............
     """
     file = open(name)
-    print('file state',file.closed)
+    #print('file state',file.closed)
     alllines = file.readlines()
     l = []
     for eachline in alllines:
@@ -43,7 +43,7 @@ def parsefile(name):
         l.append(eachlinelist_)
         #print('current line:'+str(eachlinelist))
     file.close()
-    print(l)
+    #print(l)
     return(l)
 
 
@@ -73,8 +73,8 @@ def getTimeRelatedInterestedData():
             if duration > interestThreshold:
                 timeRelatedData.append(eachrecord[0])
         timeRelatedDataDic.append(timeRelatedData)
-        print("intereted track of p"+ str(count) ,end = ':')
-        print(timeRelatedData)
+        #print("intereted track of p"+ str(count) ,end = ':')
+        #print(timeRelatedData)
     #print(timeRelatedDataDic)
     #print(len(timeRelatedDataDic))
     return timeRelatedDataDic
