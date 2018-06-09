@@ -2,12 +2,18 @@
 
 --anoDetection.py  
          
-           use Kmeans algo to detect the anomaly  
+           use Kmeans algo to **detect the anomaly**  
            
 --assomining.py  
  
            implement apriori algo to find the associated cameras(just use the total duration of each camera each person,sequence data not included)  
-           implement SPADE algo to find associated camera sequences  
+           implement SPADE algo to find **associated camera sequences,or camera paths**  
            
+--preVisu.py  
+           export **tracebook** for visulization   
+           prepare for visudata export  
+              
+             
 --visu.py  
-           some logical implement of visualizing the whole data traces info of every frame
+           export **visudata** 
+           prepare for drawing
