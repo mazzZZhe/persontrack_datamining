@@ -1,5 +1,9 @@
+from readinfo import readinfo
+
+
 def generateFeatureDic(l):
-    cameraNum = 6 
+    info = readinfo('info.json')
+    cameraNum = len(info['camera'])
     featureDic = []
     #how many cameras in all
     #print(len(l))
